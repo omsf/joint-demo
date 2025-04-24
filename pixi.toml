@@ -1,0 +1,16 @@
+[workspace]
+authors = ["Matthew W. Thompson <mattwthompson@protonmail.com>"]
+channels = ["conda-forge"]
+name = "demo"
+platforms = ["osx-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "3.12.*"
+openfe = "==1.3.1"
+openff-toolkit-examples = "==0.16.8"
+nglview = "*"
+jupyterlab = "*"
+ruff = "*"

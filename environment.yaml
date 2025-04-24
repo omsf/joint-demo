@@ -1,0 +1,7 @@
+name: demo
+channels:
+  -  conda-forge
+dependencies:
+  - python==3.12.*
+  - openfe==1.3.1
+  - openff-toolkit-examples

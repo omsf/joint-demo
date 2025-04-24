@@ -1,0 +1,7 @@
+# pixi environments
+.pixi
+*.egg-info
+.ipynb_checkpoints/
+
+# intermediate files
+trajectory.dcd

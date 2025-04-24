@@ -1,0 +1,5 @@
+# ruff.toml
+
+target-version = "py312"
+include = ["demo.py"]
+lint.select = ["F", "E", "W", "NPY", "UP", "RUF", "I"]

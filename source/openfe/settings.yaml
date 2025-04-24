@@ -1,0 +1,5 @@
+mapper:
+  method: kartograf
+
+network:
+  method: generate_minimal_spanning_network

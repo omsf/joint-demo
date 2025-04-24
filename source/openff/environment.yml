@@ -1,0 +1,41 @@
+name: openff-ugm-2025
+channels:
+    - conda-forge
+dependencies:
+    - pip
+    - python=3.11
+    - jupyterlab>=4
+    - ipywidgets>=8
+    - jupyterlab_execute_time
+    - jupyterlab-lsp
+    # - pyright
+    - jedi-language-server
+    - jupyterlab_code_formatter
+    - black
+    - isort
+    # Cookbook
+    - gitpython
+    - nbconvert
+    - nbformat
+    - requests
+    - packaging
+    # Examples
+    - openff-toolkit-examples =0.16.8
+    - openff-interchange =0.4
+    - openff-nagl =0.5.2
+    - openff-qcsubmit
+    - rich
+    - jax
+    - dgl
+    - nglview>=3.0.6
+    - xtb-python
+    - pdbfixer
+    - mdtraj
+    - psi4
+    - openmmtools
+    - chemper
+    - mdanalysis
+    - plotly
+    - pyxdg
+    - pip:
+        - git+https://github.com/openforcefield/openff-pablo.git@v0.0.1a1

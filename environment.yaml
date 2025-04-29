@@ -33,10 +33,10 @@ dependencies:
 - h5py
 - e3nn
 - ase
-
-
+- loguru
 - pip:
   - openadmet-toolkit @ git+https://github.com/OpenADMET/openadmet-toolkit.git
+  - openadmet-models @ git+https://github.com/OpenADMET/openadmet-models.git
   - phx-class-registry
   - email-validator
   - git+https://github.com/OpenADMET/mtenn.git@remove_dgl

@@ -1,7 +1,42 @@
+# pixi workspace export conda-environment -e demo > environment.yaml
 name: demo
 channels:
-  -  conda-forge
+- conda-forge
+- nodefaults
 dependencies:
-  - python==3.12.*
-  - openfe==1.3.1
-  - openff-toolkit-examples
+- ruff *
+- openff-toolkit-examples ==0.16.8
+- openfe ==1.3.1
+- python 3.12.*
+- nglview *
+- jupyterlab *
+- intake
+- zarr >=3.0.0
+- molfeat
+- datamol
+- mordredcommunity
+- lightgbm
+- seaborn
+- splito
+- umap-learn
+- modal
+- chemprop >= 2.1.1
+- pytorch # <2.4.0
+- pytorch-lightning
+- wandb
+- statsmodels
+- mdanalysis
+- pytorch_geometric
+- pytorch_cluster
+- pytorch_scatter
+- pytorch_sparse
+- h5py
+- e3nn
+- ase
+
+
+- pip:
+  - openadmet-toolkit @ git+https://github.com/OpenADMET/openadmet-toolkit.git
+  - phx-class-registry
+  - email-validator
+  - git+https://github.com/OpenADMET/mtenn.git@remove_dgl

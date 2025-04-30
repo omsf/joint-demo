@@ -38,4 +38,22 @@ We can filter this just with a little bit of Pandas, and quickly get a subset of
 this ADMET filtering.
 
 Now we have a target, a set of ligands we want to look more closely at, and a desire to do some free calculations.
-OpenFE's tooling makes this straightforward, and our next steps will set up some ABFE calculations.
+OpenFE's tooling makes this straightforward, and our next steps will set up some RBFE calculations. There are a few
+ways to use OpenFE, a CLI which provides easy access to the most common functionality and a Python API which enables
+a wider set of features and options. Here we'll be using the CLI, but there's lots of cool stuff in the API too.
+
+Here we'll be using the API in three parts - okay, two and hand-waving one - to go from a protein in a PDB file and a
+set of ligands in an SDF file to delta G values. Basically, we prepare, run, and analyze simulations with the following
+three commands.
+
+_run plan-rbfe-network call_
+
+Each of these JSON files describes a particular transformation. It's human-readable so in principle you can inspect its
+contents, but practically it's a large set of detailed instructions for `openfe` to run a particular alchemical
+transformation between two states.
+
+If we had the right combination of GPUs and days to wait, we could run all of these simulations until they converge.
+We would do this by calling `openfe quickrun` a number of times on each JSON file, which itself store each result in a
+JSON file. We don't have an army of GPUs or time to run all of this compute, so I'm using some pre-computed results.
+
+_run gather call_

@@ -6,7 +6,7 @@ you can run right now, so as excited as we are about things like cofolding with 
 
 0:40
 
-If you want to follow along, the materials are available on GitHub at the following link: 
+If you want to follow along, the materials are available on GitHub at the following link:
 
 Let's say we're a team of computational chemists supporting a team of medicinal chemists designing ligands for
 biological targets. In this case we're looking at MCL-1, which is a well-known target for concology, and trying to
@@ -48,12 +48,18 @@ three commands.
 
 _run plan-rbfe-network call_
 
+This sets up a series of alchemical transformations between ligands. By default, a minimal spanning network and the
+Kartograph atom mapper are used and each transformation is run in triplicate. Also by default, Sage 2.1.1 is used for
+small molecule parameters.
+
 Each of these JSON files describes a particular transformation. It's human-readable so in principle you can inspect its
-contents, but practically it's a large set of detailed instructions for `openfe` to run a particular alchemical
-transformation between two states.
+contents, but practically it's a large set of detailed instructions for `openfe` to run a each
+transformation.
 
 If we had the right combination of GPUs and days to wait, we could run all of these simulations until they converge.
 We would do this by calling `openfe quickrun` a number of times on each JSON file, which itself store each result in a
 JSON file. We don't have an army of GPUs or time to run all of this compute, so I'm using some pre-computed results.
 
 _run gather call_
+
+With default options, `openfe gather` prints a pretty table of the dG of each ligand along with uncertainy values.

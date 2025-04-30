@@ -34,6 +34,7 @@ dependencies:
 - e3nn
 - ase
 - loguru
+- seaborn
 - pip:
   - openadmet-toolkit @ git+https://github.com/OpenADMET/openadmet-toolkit.git
   - openadmet-models @ git+https://github.com/OpenADMET/openadmet-models.git

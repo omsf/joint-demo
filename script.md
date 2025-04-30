@@ -42,7 +42,7 @@ OpenFE's tooling makes this straightforward, and our next steps will set up some
 ways to use OpenFE, a CLI which provides easy access to the most common functionality and a Python API which enables
 a wider set of features and options. Here we'll be using the CLI, but there's lots of cool stuff in the API too.
 
-Here we'll be using the API in three parts - okay, two and hand-waving one - to go from a protein in a PDB file and a
+Here we'll be using the CLI in three parts - okay, two and hand-waving one - to go from a protein in a PDB file and a
 set of ligands in an SDF file to delta G values. Basically, we prepare, run, and analyze simulations with the following
 three commands.
 
@@ -63,3 +63,78 @@ JSON file. We don't have an army of GPUs or time to run all of this compute, so 
 _run gather call_
 
 With default options, `openfe gather` prints a pretty table of the dG of each ligand along with uncertainy values.
+
+So far we've taken a set of ligands and a known target, filtered out potential ADMET liabilities with OpenADMET's CLI,
+and use OpenFE's CLI to predict relative binding free energies.
+
+8:10
+
+Next, I want to dig deeper into some of these tools we've used so far, and then finish up with a few examples of new
+use cases with OpenFF force fields and tooling.
+
+Let's start with a closer look at the ADMET predictions. You may have noticed we ran models for 4 different CYPs and
+only looked at once. Let's now have a look at predicted p values for each of these ligands with each anti-target.
+
+_run plotting cell_
+
+Reminder that:
+
+* A pIC50 of 4 is an IC50 of 100 uM
+* A pIC50 of 5 is an IC50 of 10 uM
+* A pIC50 of 6 is an IC50 of 1 uM
+
+This data would suggest that these compounds have some off target CYP inhibition issues, most severely for CYP1A2
+average pIC50 of ~6. Ouch!
+
+But how good are these models, really?
+
+_show cell comparing pChEMBL_
+
+The OpenADMET team thinks these models generally over-predict p due to the pChEMBL data itself having a positive skew.
+That is to say, the dataset probably skews towards CYP inhibitors (high p) and away from non-binders (low p) and
+doesn't reflect very well the breadth of chemistry that you might design ligands with.
+
+We can see this by looking at the p values for the underlying ChEMBL data
+
+_show cell visualizing ChEMBL data_
+
+We see that this data has a heavy skew towards strong CYP inhibitors and not much data on weaker binders. This
+highlights the need for vastly more data collection of broader chemistries, ideally guided by missing coverage in the
+datasets. This sort of active learning is exactly what OpenADMET is doing with their partners soon.
+
+10:15
+
+Next let's dig into the OpenFE CLI a little bit more and unpack a few decisions we made along the way.
+
+One added detail in the workflow is that each ligand's partial charges were assigned while setting up the network,
+before each solvated protein-ligand complex was set up. This is encouraged because of how AM1-BCC can
+occassionally give different results on different hardware, can be slow to run multiple times, and errors in free
+energy calculations are particularly sensitive to seemingly small partial charge differences.
+
+_run openfe charge-molecules cell_
+
+There are a number of other options that can be tinkered with in this command, just like other CLI calls, such as using
+OpenEye to generate AM1-BCC ELF10 charges or using NAGL to generate GNN charges. These options can be passed in through
+the `settings.yaml` file.
+
+Next, let's talk about network planning, something else a practioner can tinker with via the settings file. Kartograph
+has implemented a bunch of different networks, a subset of which has been implemented in OpenFE since some of them are
+not practical. The default network, which we used earlier, is a minimal spanning tree, which minimizes the number of
+edges that can connect all nodes in a network.
+
+OpenFE has some convenience tools to visualize these networks, which are themselves stored in these GraphML files.
+
+_show network visualizaiton_
+
+If we wanted to switch to, say, a radial or star map, which connects a
+single node to each other node like a wheel with spokes, we can do that by defining it in the settings YAML and
+re-running the network planning command.
+
+_show radial.yaml, run plan-rbfe-network_
+If we wanted to switch to, say, a radial or star map, which connects a single node to each other node like a wheel with
+spokes, we can do that by defining it in the settings YAML and re-running the network planning command. This network
+takes another argument for the central ligand, let's just use ligand 6.
+
+_show radial.yaml, run plan-rbfe-network_
+
+14:00

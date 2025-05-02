@@ -82,7 +82,7 @@ Next, I want to dig deeper into some of these tools we've used so far, and then 
 use cases with OpenFF force fields and tooling.
 
 Let's start with a closer look at the ADMET predictions. You may have noticed we ran models for 4 different CYPs and
-only looked at once. Let's now have a look at predicted p values for each of these ligands with each anti-target.
+only looked at one. Let's now have a look at predicted p values for each of these ligands with each anti-target.
 
 _run plotting cell_
 
@@ -204,6 +204,8 @@ result.
 
 Now that we have a topology, we can do just what we did before - take it and a force field and pass it off to OpenMM,
 then visualize the result.
+
+22:20
 
 (PTM section: 4:10)
 

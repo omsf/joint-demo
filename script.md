@@ -14,6 +14,9 @@ Let's say we're a team of computational chemists supporting a team of medicinal 
 biological targets. In this case we're looking at MCL-1, which is a well-known target for oncology, and trying to
 inhibit its expression.
 
+In the future we might start with an OpenFold3 prediction, which we could get from a one-liner with relatively few
+arguments ... but for now let's just use a well-established crystal structure of this target.
+
 _go into notebook, show protein structure with NGLview_
 
 Imagine we've been given a set of ligands via a CSV file of SMILES.

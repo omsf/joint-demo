@@ -5,7 +5,7 @@ channels:
 - nodefaults
 dependencies:
 - ruff *
-- openff-toolkit-examples ==0.16.8
+- openff-toolkit-examples ==0.16.9
 - openfe ==1.4.0
 - python 3.12.*
 - nglview *

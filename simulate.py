@@ -1,6 +1,6 @@
+import nglview
 from openff.toolkit import ForceField, Molecule
 from rdkit import Chem
-import nglview
 
 
 def simulate_and_visualize(

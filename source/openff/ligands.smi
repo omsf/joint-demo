@@ -10,7 +10,7 @@ CC(CC1=CC=CC=C1)N amphetamine
 CN1C=NC2=C1C(=O)N(C(=O)N2C)C caffeine
 CC(C(=O)O)N alanine
 C1=CC=CC=C1 benzene
-C1=CC=CC=C1n benzenamine
+C1=CC=CC=C1[NH2] benzenamine
 CC(=O)C acetone
 C1=COC=C1 furan
 CC(=O)Nc1ccc(cc1)O acetaminophen

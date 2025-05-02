@@ -7,11 +7,6 @@ import openmm
 import openmm.app
 import openmm.unit
 import rdkit
-from openff.toolkit import ForceField, Molecule, Quantity, Topology
-from openff.toolkit.utils.exceptions import InvalidAtomMetadataError
-from openff.toolkit.utils.toolkits import NAGLToolkitWrapper
-from rdkit.Chem.rdChemReactions import ReactionFromSmarts
-
 from openff.interchange import Interchange
 from openff.interchange.components.potentials import Potential
 from openff.interchange.exceptions import NonIntegralMoleculeChargeError
@@ -21,12 +16,17 @@ from openff.interchange.models import (
     SingleAtomChargeTopologyKey,
 )
 from openff.pablo._utils import draw_molecule
+from openff.toolkit import ForceField, Molecule, Quantity, Topology
+from openff.toolkit.utils.exceptions import InvalidAtomMetadataError
+from openff.toolkit.utils.toolkits import NAGLToolkitWrapper
+from rdkit.Chem.rdChemReactions import ReactionFromSmarts
+
 
 __all__ = [
     "draw_molecule",
+    "get_openmm_total_charge",
     "nglview_show_openmm",
     "react",
-    "get_openmm_total_charge",
 ]
 
 
@@ -177,7 +177,8 @@ def parametrize_with_nagl(
     print("replacing dummy charges with NAGL charges ... ")
     for key, charge in interchange["Electrostatics"].charges.items():
         if key.atom_indices[0] in nagl_indices:
-            # only modify charges where dummy placeholder of 0.0 was assigned from "[*:1]" parameter
+            # only modify charges where dummy placeholder of 0.0 was assigned
+            # from "[*:1]" parameter
             index = key.atom_indices[0]
 
             # If we haven't seen this molecule before, we need to calculate its
@@ -187,7 +188,8 @@ def parametrize_with_nagl(
             index_in_molecule = atom.molecule_atom_index
             if molecule.partial_charges is None:
                 print(
-                    f"assigning graph charges to {molecule.name or molecule.hill_formula} ..."
+                    "assigning graph charges to "
+                    f"{molecule.name or molecule.hill_formula} ..."
                 )
                 molecule.assign_partial_charges(
                     partial_charge_method=nagl_method,
@@ -314,7 +316,8 @@ def react(
         # Fix metadata of products
         for product_template in rxn.GetProducts():
             for product_rdmol, product_offmol in zip(products, product_offmols):
-                # Go over atoms changed in the reaction and fix their metadata (rdkit often loses it)
+                # Go over atoms changed in the reaction and fix their metadata
+                # (rdkit often loses it)
                 for product_idx, product_template_idx in enumerate(
                     product_rdmol.GetSubstructMatch(product_template)
                 ):
@@ -358,12 +361,3 @@ def simulate_and_visualize(interchange):
     simulation.reporters.append(dcd_reporter)
     simulation.step(1000)
 
-
-#   # Visualize the trajectory
-#   trajectory: mdtraj.Trajectory = mdtraj.load(
-#       ".dcd", top=mdtraj.Topology.from_openmm(interchange.to_openmm_topology())
-#   )
-#   view = nglview.show_mdtraj(trajectory)
-#   view.add_representation("line", selection="protein")
-#   view.add_line(selection="water")
-#   return view

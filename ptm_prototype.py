@@ -354,11 +354,11 @@ def simulate_and_visualize(interchange):
 
     simulation = interchange.to_openmm_simulation(integrator)
     simulation.minimizeEnergy(tolerance=100)
-    dcd_reporter = openmm.app.DCDReporter(file="ptm.dcd",
-                                          reportInterval=10
-                                         )
+    dcd_reporter = openmm.app.DCDReporter(file="ptm.dcd", reportInterval=10)
     simulation.reporters.append(dcd_reporter)
     simulation.step(1000)
+
+
 #   # Visualize the trajectory
 #   trajectory: mdtraj.Trajectory = mdtraj.load(
 #       ".dcd", top=mdtraj.Topology.from_openmm(interchange.to_openmm_topology())

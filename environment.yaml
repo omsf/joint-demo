@@ -1,9 +1,10 @@
-# pixi workspace export conda-environment -e demo > environment.yaml
 name: demo
 channels:
 - conda-forge
+- openeye
 - nodefaults
 dependencies:
+- openeye-toolkits  # optional! just to get faster AM1-BCC
 - ruff *
 - openff-toolkit-examples ==0.16.9
 - openfe ==1.4.0

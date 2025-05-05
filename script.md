@@ -12,7 +12,7 @@ If you want to follow along, the materials are available on GitHub at the follow
 
 Let's say we're a team of computational chemists supporting a team of medicinal chemists designing ligands for
 biological targets. In this case we're looking at MCL-1, which is a well-known target for oncology, and trying to
-inhibit its expression.
+inhibit its activity.
 
 In the future we might start with an OpenFold3 prediction, which we could get from a one-liner with relatively few
 arguments ... but for now let's just use a well-established crystal structure of this target.
@@ -26,9 +26,7 @@ _go into notebook, show ligand CSV file and visualization_
 Visual inspection will show you this this is a congeneric series based around a bi-heterocyclic core, with
 substitution of the heterocycle and elaborations at both ends.
 
-We want to asses ligands by how strongly they bind to MCL1, but also care about if they'd be filtered out by the body
-before they can get to a tumor cell - metabolism, toxicity, anything within ADMET. Likewise, we'd want to filter out
-any compounds that may have some ADMET liabilities before continuing to lead optimization. A pass through our dataset
+We want to asses ligands by how strongly they bind to MCL1, but also care about if they'd have off-target effects. A pass through our dataset
 at this stage isn't free, but it's relatively quick and cheap, almost certainly more efficient than trying to "fix" a
 series at a later stage, after lead optimization.
 
@@ -38,6 +36,8 @@ _go into notebook, run `openadmet predict` cell_
 
 **REMINDER** The models used here are simple demonstration models and have significant shortcomings, a more
 sophisticated approach is recommended in practice.
+
+Ryan's word: Models will improve as the OpenADMET project starts to receive data from their partners at Octant and UCSF. More advanced models are also in the works
 
 For the purposes of our exercise lets hone in on CYP3A4 inhibition since CYP3A4 is responsible for large proportion of
 hepatic metabolism relative to other CYPs. For starters, let's use use a cutoff of a predicted IC50 of 2.5 micromolar,
@@ -58,12 +58,13 @@ three commands.
 
 _run plan-rbfe-network call_
 
-This sets up a series of alchemical transformations between ligands. By default, a minimal spanning network and the
-Kartograph atom mapper are used and each transformation is run in triplicate. Also by default, Sage 2.1.1 is used for
-small molecule parameters.
+This sets up a series of alchemical transformations between ligands. A minimal spanning network and the Kartograph atom
+mapper are used. Each transformation is run in triplicate and Sage is used for small molecule parameters.
 
 Each of these JSON files describes a particular transformation. It's human-readable so in principle you can inspect its
 contents, but practically it's a large set of detailed instructions for `openfe` to run a each transformation.
+
+OpenFE has some convenience tools to visualize these networks, which are themselves stored in these GraphML files.
 
 If we had the right combination of GPUs and days to wait, we could run all of these simulations until they converge.
 We would do this by calling `openfe quickrun` a number of times on each JSON file, which itself store each result in a
@@ -126,12 +127,10 @@ There are a number of other options that can be tinkered with in this command, j
 OpenEye to generate AM1-BCC ELF10 charges or using NAGL to generate GNN charges. These options can be passed in through
 the `settings.yaml` file.
 
-Next, let's talk about network planning, something else a practitioner can tinker with via the settings file. Kartograph
-has implemented a bunch of different networks, a subset of which has been implemented in OpenFE since some of them are
-not practical. The default network, which we used earlier, is a minimal spanning tree, which minimizes the number of
-edges that can connect all nodes in a network.
-
-OpenFE has some convenience tools to visualize these networks, which are themselves stored in these GraphML files.
+Next, let's talk about network planning, something else a practitioner can tinker with via the settings file. Konnektor
+has has implemented a bunch of different networks, a subset of which has been implemented in OpenFE. The default
+network, which we used earlier, is a minimal spanning tree, which minimizes the number of edges that can connect all
+nodes in a network.
 
 _show network visualization_
 

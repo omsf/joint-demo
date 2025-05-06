@@ -17,7 +17,18 @@ biological targets. We are interested in MCL-1, which is a well-known target for
 activity.
 
 In the future we might start with an OpenFold3 prediction, which we could get from a one-liner with relatively few
-arguments, like this ... but for now let's just use a well-established crystal structure of this target.
+arguments, like this ... 
+
+_show pseudo one-liner_
+
+... but until OpenFold 3 is released, I'm going to be using a pre-production model that was prepared ahead of time.
+
+_show co-folding section_
+
+Here we have the PDB record 5FDR in blue compared against an co-folding prediction in red. We can see excellent
+agreement with the crystallographic result.
+
+For now, however, let's just use a well-established crystal structure of this target.
 
 _show protein_
 
@@ -65,8 +76,7 @@ _run plan-rbfe-network call_
 
 This sets up a series of alchemical transformations between ligands. Based on our settings file, the Kartograph atom
 mapper is used and a minimal spanning network is generated. Sage is used for small molecule parameters, so AM1-BCC
-partial charges are used. We can see some valuable information is logged, and we can also see that AM1-BCC takes a few
-seconds even having provided many cores.
+partial charges are used. We can see some valuable information is logged.
 
 The main output of this command is a bunch of JSON files, each describing a particular transformation. There's also a
 GraphML file which describes the network, and OpenFE has some convenience tools used to visualize them.
@@ -88,20 +98,15 @@ and use OpenFE's CLI to predict relative binding free energies using OpenFF's sm
 
 _pause_
 
-8:10
+7:30
 
 Next, I want to dig deeper into some of these tools we've talked about so far in our HTS pipeline, and then finish up
 with a few examples of other use cases enabled by OpenFF force fields and infrastructure.
 
-Earlier I mentioned that we could use an OpenFold-predicted structure as the starting point, but we're holding off
-until that's fully released. I do have a pre-production result to share here, one that co-folds MCL1 with a ligand not
-in our data set. If we superimpose the prediction on top of a structure from the protein data bank, we see excellent
-agreement with the crystallographic result.
-
 _show OpenFold 3 prediction cell_
 
 Let's have a closer look at the ADMET predictions. You may have noticed we ran models for 4 different CYPs and
-only looked at one. Let's now have a look at predicted p values for each of these ligands with each anti-target.
+only looked at one. Let's now have a look at predicted pIC50 values for each of these ligands with each anti-target.
 
 _run plotting cell_
 
@@ -113,9 +118,9 @@ average pIC50 of ~6.
 
 But how good are these models, really? Are all of these ligands really binding to CYPs in the range of 1-10 micromolar?
 
-The OpenADMET team thinks these models generally over-predict p due to the pChEMBL data itself having a positive skew.
-That is to say, the dataset probably skews towards CYP inhibitors (high p) and away from non-binders (low p) and
-doesn't reflect very well the breadth of chemistry that you might design ligands with.
+The OpenADMET team thinks these models generally over-predict binding strength due to the pChEMBL data itself having a
+positive skew.  That is to say, the dataset probably skews towards CYP inhibitors (high p) and away from non-binders
+(low p) and doesn't reflect very well the breadth of chemistry that you might design ligands with.
 
 _show cell visualizing pChEMBL data_
 
@@ -123,7 +128,7 @@ We see that this underlying data from ChEMBL has a heavy skew towards strong CYP
 binders. This probably limits the applicability to arbitrary chemistries in an HTS context, and highlights the need for
 vastly more data collection of broader chemistries, ideally guided by missing coverage in the datasets.
 
-10:15
+10:30
 
 Next let's dig into the OpenFE CLI a little bit more.
 
@@ -165,33 +170,50 @@ functionality that can be accessed by interacting directly with OpenFF software,
 ground running for simple system. For starters, we'll show that with OpenFF it takes literal seconds to go from loading
 a molecule into RDKit to visualizing a simulation trajectory.
 
-Here we have an aspirin molecule in SDF, which we can load into RDKit and have a quick look at. We need to load a force
-field; here I'll use a recent version in the Sage line, version 2.2.1. From here, it's a one-liner to prepare an OpenMM
-system and a little bit of boilerplate to get the simulation running. I've wrapped that up into a separate function in 
-the file `simulate.py` if you want to have a look. This function returns an NGLview widget of the trajectory, and
-that's all it takes to run MD from RDKit.
+Here we have an aspirin molecule in SDF, which we can load into RDKit and have a quick look at.
 
-(rdkit-to-MD section: 1:25)
+_show aspirin cell_
 
-Okay, that's a good start, but the more complex interesting systems are more valuable. OpenFF tooling fully supports
-simulating protein-ligand complexes, and the process is similar to running simulations of a single molecule. The main
-difference is that we need to prepare a topology, which is simply a collection of molecules, and that can take a couple
-of extra steps.
+We need to load a force field; here I'll use a recent version in the Sage line, version 2.2.1. From here, it's a
+one-liner to prepare an OpenMM system and a little bit of boilerplate to get the simulation running. I've wrapped that
+up into a separate function in the file `simulate.py` if you want to have a look. This function returns an NGLview
+widget of the trajectory, and that's all it takes to run MD from RDKit.
+
+_show aspirin trajectory_ 
+
+Next we are going to use OpenFF tooling to simulate protein-ligand complexes. The process is similar to running
+simulations of a single molecule. The main difference is that we need to prepare a topology, which is simply a
+collection of molecules, and that can take a couple of extra steps. Since this will run more slowly on my laptop, I'm
+going to run these cells ahead of time so the simulation has time to run.
 
 For starters, we'll load a PDB file of a protein-ligand complex into a `Topology` object, also passing a SMILES pattern
-representing the ligand. If we have a look, that looks good. Since we don't want to simulate this in vacuum, we need to
-add some solvent. There are a few ways of doing this, and for systems with only water and canonical residues, PDBFixer
-is a good choice. I'm just going to load a prepared solvated PDB file, but the code we used to make it is right here.
-Now we have the same protein-ligand complex solvated in water with ions. The next step is to load a force field
-appropriate for this system; we're going to use the same Sage force field for the small molecule parameters and for the
-protein we'll use a SMIRNOFF port of ff14SB. One could slot in other force fields here, for ligand, protein, or both
-chemistries, just by passing different file names to the class. The next step is to make an Interchange object out of
-this topology and force field, which can take a few seconds so I'm just going to load a serialized representation of
-this. This trick can also be useful if, for example, you want to prepare simulations on a laptop but actually run them
-on clusters or compute services.
+representing the ligand. If we have a look, that looks good.
+
+_show protein-ligand complex_
+
+Since we don't want to simulate this in vacuum, we need to add some solvent. There are a few ways of doing this, and
+for systems with only water and canonical residues, PDBFixer is a good choice.  Now we have the same protein-ligand
+complex solvated in water with ions.
+
+_show solvated protein-ligand complex_
+
+The next step is to load a force field appropriate for this system; we're going to use the same Sage force field for
+the small molecule parameters and for the protein we'll use a SMIRNOFF port of ff14SB. One could slot in other force
+fields here, for ligand, protein, or both chemistries, just by passing different file names to the class. The next step
+is to make an Interchange object out of this topology and force field, which can take a few seconds so I'm just going
+to load a serialized representation of this.
+
+_show Interchange cell_
 
 Finally, we can re-use some of that same boilerplate OpenMM code to get an MD simulation out of this state and then
-again look at it with NGLview.
+again look at it with NGLview. This function prepares and runs an OpenMM simulation for 30 seconds, so we're not going
+to get a long trajectory on this hardware but we do see some dynamics.
+
+_show protein-ligand trajectory_
+
+Here we've taken a protein-ligand complex in a PDB file and used OpenFF tooling to run an MD simulation.
+
+_pause_
 
 (protein-ligand complex section: 3:00)
 
@@ -199,17 +221,23 @@ Sometimes your amino acids may be non-canonical, or even simply a small molecule
 OpenFF has a prototype post-translational modification workflow, enabled by new science and infrastructure, which
 enables simulating these systems with a modest amount of prep.
 
-Let's say we have a flourescent dye somewhere on our protein. We can load our dye molecule like any other small
-molecule and have a look. This molecule has has a maleimide group which can take part in a click reaction with the
-thiol on a cysteine residue. That reaction can be written up in SMARTS and visualized with RDKit.
+Let's say we have a flourescent dye tagged to our protein. We can load our dye as a standalone molecule like any other
+small molecule and have a look. This molecule has has a maleimide group which can take part in a click reaction with
+the thiol on a cysteine residue.
+
+_run 2-D dye cell_
+
+That reaction can be written up in SMARTS and visualized with RDKit.
+
+_run RDKit reaction cell_
 
 We're ultimately going to load this system as a PDB file through OpenFF Pablo, a new tool being developed for better
-PDB interoperability throughout OpenFF infrastructure. A core feature is the ability to create custom residue
-definitions, which can be defined in a few ways. In this case, it's easiest to define it from an OpenFF molecule. We
+PDB interoperability throughout OpenFF infrastructure. A core feature of Pablo is support for custom residue
+definitions. These can be defined in a few ways and in this case, it's easiest to make one from an OpenFF molecule. We
 want the residue to represent the cysteine modified with the dye, so we need to get that into a single-molecule
 representation. We have a function `react` which wraps RDKit to do this, the details of which are available in the
-source Python file. It does just what you'd expect - take two reactant molecules and return the result. One added
-wrinkle is the need to correct atom names, which we have encoded here. We can run this "reaction" and look at the
+source Python file. It does just what you'd expect - take two reactant molecules and return the result. We also have to
+modify atom names for reasons that are elaborated in the full workflow.  We can run this "reaction" and look at the
 resulting molecule.
 
 That's just about all the set up we need to do. The last step is creating our residue definition from this molecule and
@@ -217,10 +245,36 @@ a canned definition of a peptide bond. We can pass this to Pablo's `topology_fro
 result.
 
 Now that we have a topology, we can do just what we did before - take it and a force field and pass it off to OpenMM,
-then visualize the result.
+then visualize the result. A final wrinkle here is that, due to the modified residue, NAGL was used to assign charges
+to the protein, although ff14SB charges were backfilled onto standard residues so only the modified cysteined and dye
+ended up with end up with NAGl-assigned charges.
 
-22:20
+22:10
 
-(PTM section: 4:10)
+Finally, I wanted to demonstrate one of the many powerful features of NAGL, which is how quickly it can assign partial
+charges to large ligands. I've extracted the ligand from the 5FDR PDB record, which is larger than that ligands in the
+screening workflow we went through earlier. AM1-BCC becomes much slower as the number of heavy atoms in a molecule
+increases.
 
-(NAGL timings section: 2:00)
+_show ligand cell_
+
+Timing I did ahead of time shows that this takes more than three minutes with AmberTools.
+
+_show NAGL timings cell_
+
+NAGL can assign partial charges to the same molecule quickly enough that we can do it live. On average, the runtime is
+less than one second.
+
+In summary, we've demonstrated how OMSF tools can work together in a high-throughput screening pipeline. We also looked
+more closely at some more advanced features offered by each project. This included
+* a co-folding result generated by a pre-production OpenFold 3-style model
+* a closer look at ADMET filtering with OpenADMET
+* some of the free energy options exposed in the OpenFE CLI
+* running protein-ligand complexes, including post-translational modifications, with OpenFF
+
+This is just a small sample of what can be done with OMSF tools, however. We're excited to see what you can do with
+them in the future.
+
+Credits
+
+... and for any questions, I'm happy to continue the discussion in the conference discord server.

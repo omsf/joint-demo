@@ -9,8 +9,9 @@ dependencies:
 - openff-toolkit-examples ==0.16.9
 - openfe ==1.4.0
 - konnektor
-- python 3.12.*
+- python 3.11.*
 - nglview *
+- pymol-open-source
 - jupyterlab *
 - intake
 - zarr >=3.0.0

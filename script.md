@@ -103,8 +103,6 @@ _pause_
 Next, I want to dig deeper into some of these tools we've talked about so far in our HTS pipeline, and then finish up
 with a few examples of other use cases enabled by OpenFF force fields and infrastructure.
 
-_show OpenFold 3 prediction cell_
-
 Let's have a closer look at the ADMET predictions. You may have noticed we ran models for 4 different CYPs and
 only looked at one. Let's now have a look at predicted pIC50 values for each of these ligands with each anti-target.
 

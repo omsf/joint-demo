@@ -1,125 +1,137 @@
+# Joint demo script
+
 This morning we've heard from each individual OMSF project about what they've been up to and where they're going next.
 Throughout this afternoon, we'll be hearing from some industry partners about what they've built using OMSF products.
 In between these spaces, I'm going to spend the next few minutes showing off how some OMSF products work with each
 other in addition to diving slightly deeper into a few capabilities along the way. Everything will be something that
-you can run right now, so as excited as we are about things like co-folding with OpenFold3, running simulations with
-Rosemary, or 3-D ADMET predictions, I'll be focusing on software you can install right now and things you do with with
-it right now.
+you can run right now, so as excited as we are about things like SMIRNOFF protein force fields or co-folding at scale
+with OpenFold 3, I'll be focusing on released software you can install and use right now.
 
 0:40
 
 If you want to follow along, the materials are available on GitHub at the following link:
+https://github.com/openforcefield/joint-demo
 
 Let's say we're a team of computational chemists supporting a team of medicinal chemists designing ligands for
-biological targets. In this case we're looking at MCL-1, which is a well-known target for oncology, and trying to
-inhibit its activity.
+biological targets. We are interested in MCL-1, which is a well-known target for oncology, and trying to inhibit its
+activity.
 
 In the future we might start with an OpenFold3 prediction, which we could get from a one-liner with relatively few
-arguments ... but for now let's just use a well-established crystal structure of this target.
+arguments, like this ... but for now let's just use a well-established crystal structure of this target.
 
-_go into notebook, show protein structure with NGLview_
+_show protein_
 
 Imagine we've been given a set of ligands via a CSV file of SMILES.
 
-_go into notebook, show ligand CSV file and visualization_
+_show ligand SMILES dataframe and 2-D structures_
 
 Visual inspection will show you this this is a congeneric series based around a bi-heterocyclic core, with
 substitution of the heterocycle and elaborations at both ends.
 
-We want to asses ligands by how strongly they bind to MCL1, but also care about if they'd have off-target effects. A pass through our dataset
-at this stage isn't free, but it's relatively quick and cheap, almost certainly more efficient than trying to "fix" a
-series at a later stage, after lead optimization.
+Our overarching goal is to asses how strongly each ligand binds to MCL1, but we also care if they'd have off-target
+effects. Here, we'll use OpenADMET's CLI to evaluate this ligand set against a series of CYP anti-targets. A pass
+through our dataset at this stage isn't free, but it's relatively quick and cheap, almost certainly more efficient than
+trying to "fix" a series at a later stage, after lead optimization.
 
-Here, we'll use OpenADMET's CLI to evaluate this ligand set against a series of CYP anti-targets.
+_go into notebook, run openadmet predict cell_
 
-_go into notebook, run `openadmet predict` cell_
-
-**REMINDER** The models used here are simple demonstration models and have significant shortcomings, a more
-sophisticated approach is recommended in practice.
-
-Ryan's word: Models will improve as the OpenADMET project starts to receive data from their partners at Octant and UCSF. More advanced models are also in the works
+A reminder here that the models used in this notebook are simple demonstration models not fully ready for production.
+More advanced models are currently being developed, and in the future models will also improve as the OpenADMET project
+starts to receive data from their partners at Octant and UCSF.
 
 For the purposes of our exercise lets hone in on CYP3A4 inhibition since CYP3A4 is responsible for large proportion of
 hepatic metabolism relative to other CYPs. For starters, let's use use a cutoff of a predicted IC50 of 2.5 micromolar,
-which corresponds to a p value of 5.6. This is not realistic for a production run, but it's acceptable for our uses
+which corresponds to a pIC50 of 5.6. This is not realistic for a production run, but it's acceptable for our uses
 today.
 
-We can filter this just with a little bit of Pandas, and quickly get a subset of the original ligand set which passes
-this ADMET filtering.
+_run Pandas cells_
 
-Now we have a target, a set of ligands we want to look more closely at, and a desire to do some free calculations.
-OpenFE's tooling makes this straightforward, and our next steps will set up some RBFE calculations. There are a few
-ways to use OpenFE, a CLI which provides easy access to the most common functionality and a Python API which enables a
-wider set of features and options. Here we'll be using the CLI, but there's lots of cool stuff in the API too.
+With a little bit of Pandas, we can quickly get a subset of the original ligand set which has PIC50 below our threshold
+value. We are left with 14 ligands out of our original 18.
 
-Here we'll be using the CLI in three parts - okay, two and hand-waving one - to go from a protein in a PDB file and a
-set of ligands in an SDF file to delta G values. Basically, we prepare, run, and analyze simulations with the following
-three commands.
+Having filtered out ligands with CYP3A4 issues, we are now moving on to free energy calculations of the remaining
+ligands, which we will dow ith OpenFE. There are a few ways to use OpenFE's tooling, there is a CLI which provides easy
+access to the most commonly-used features and a Python API which enables a wider set of more advanced features and
+options.  Here we'll be using the CLI, but there's lots of cool stuff in the API too.
+
+With our target and ligands already prepared, we will be using the OpenFE CLI in three parts to end with delta G
+values. Basically, we prepare, run, and analyze these free energy calculations with three commands.
+
+We will make use of YAML files which encode settings used in these commands. Our settings file is relatively simple,
+leaving most things at their defaults, but there are many other options that can be enabled. We'll explore a couple of
+these later.
 
 _run plan-rbfe-network call_
 
-This sets up a series of alchemical transformations between ligands. A minimal spanning network and the Kartograph atom
-mapper are used. Each transformation is run in triplicate and Sage is used for small molecule parameters.
+This sets up a series of alchemical transformations between ligands. Based on our settings file, the Kartograph atom
+mapper is used and a minimal spanning network is generated. Sage is used for small molecule parameters, so AM1-BCC
+partial charges are used. We can see some valuable information is logged, and we can also see that AM1-BCC takes a few
+seconds even having provided many cores.
 
-Each of these JSON files describes a particular transformation. It's human-readable so in principle you can inspect its
-contents, but practically it's a large set of detailed instructions for `openfe` to run a each transformation.
+The main output of this command is a bunch of JSON files, each describing a particular transformation. There's also a
+GraphML file which describes the network, and OpenFE has some convenience tools used to visualize them.
 
-OpenFE has some convenience tools to visualize these networks, which are themselves stored in these GraphML files.
+_run `draw_ligand_network` cells_
 
-If we had the right combination of GPUs and days to wait, we could run all of these simulations until they converge.
-We would do this by calling `openfe quickrun` a number of times on each JSON file, which itself store each result in a
-JSON file. We don't have an army of GPUs or time to run all of this compute, so I'm using some pre-computed results.
+If we had the right combination of GPUs and days to wait, we could run each of these simulations until they converge.
+We would do this by calling `openfe quickrun` on each JSON file, which itself store each result in a JSON file. We
+don't have an army of GPUs or a time machine, so I'm using some pre-computed results.
 
 _run gather call_
 
-With default options, `openfe gather` prints a pretty table of the dG of each ligand along with uncertainy values.
+After all simulations are run, the final step is to run `openfe gather` to get our relative binding free energies back.
+With default options and the recent version 1.4.0, we get a pretty table of the dG of each ligand along with
+corresponding uncertainty values.
 
 So far we've taken a set of ligands and a known target, filtered out potential ADMET liabilities with OpenADMET's CLI,
-and use OpenFE's CLI to predict relative binding free energies.
+and use OpenFE's CLI to predict relative binding free energies using OpenFF's small molecule force field Sage.
+
+_pause_
 
 8:10
 
-Next, I want to dig deeper into some of these tools we've used so far, and then finish up with a few examples of new
-use cases with OpenFF force fields and tooling.
+Next, I want to dig deeper into some of these tools we've talked about so far in our HTS pipeline, and then finish up
+with a few examples of other use cases enabled by OpenFF force fields and infrastructure.
 
-Let's start with a closer look at the ADMET predictions. You may have noticed we ran models for 4 different CYPs and
+Earlier I mentioned that we could use an OpenFold-predicted structure as the starting point, but we're holding off
+until that's fully released. I do have a pre-production result to share here, one that co-folds MCL1 with a ligand not
+in our data set. If we superimpose the prediction on top of a structure from the protein data bank, we see excellent
+agreement with the crystallographic result.
+
+_show OpenFold 3 prediction cell_
+
+Let's have a closer look at the ADMET predictions. You may have noticed we ran models for 4 different CYPs and
 only looked at one. Let's now have a look at predicted p values for each of these ligands with each anti-target.
 
 _run plotting cell_
 
-Reminder that:
-
-* A pIC50 of 4 is an IC50 of 100 uM
-* A pIC50 of 5 is an IC50 of 10 uM
-* A pIC50 of 6 is an IC50 of 1 uM
+Reminder that smaller pIC50 values correspond to larger IC50, so weaker CYP binders are on the left and stronger
+binders are on the right.
 
 This data would suggest that these compounds have some off target CYP inhibition issues, most severely for CYP1A2
-average pIC50 of ~6. Ouch!
+average pIC50 of ~6.
 
-But how good are these models, really?
-
-_show cell comparing pChEMBL_
+But how good are these models, really? Are all of these ligands really binding to CYPs in the range of 1-10 micromolar?
 
 The OpenADMET team thinks these models generally over-predict p due to the pChEMBL data itself having a positive skew.
 That is to say, the dataset probably skews towards CYP inhibitors (high p) and away from non-binders (low p) and
 doesn't reflect very well the breadth of chemistry that you might design ligands with.
 
-We can see this by looking at the p values for the underlying ChEMBL data
+_show cell visualizing pChEMBL data_
 
-_show cell visualizing ChEMBL data_
-
-We see that this data has a heavy skew towards strong CYP inhibitors and not much data on weaker binders. This
-highlights the need for vastly more data collection of broader chemistries, ideally guided by missing coverage in the
-datasets. This sort of active learning is exactly what OpenADMET is doing with their partners soon.
+We see that this underlying data from ChEMBL has a heavy skew towards strong CYP inhibitors and not much data on weaker
+binders. This probably limits the applicability to arbitrary chemistries in an HTS context, and highlights the need for
+vastly more data collection of broader chemistries, ideally guided by missing coverage in the datasets.
 
 10:15
 
-Next let's dig into the OpenFE CLI a little bit more and unpack a few decisions we made along the way.
+Next let's dig into the OpenFE CLI a little bit more.
 
-One added detail in the workflow is that each ligand's partial charges were assigned while setting up the network,
-before each solvated protein-ligand complex was set up. This is encouraged because of how AM1-BCC can occasionally
-give different results on different hardware, can be slow to run multiple times, and errors in free energy calculations
-are particularly sensitive to seemingly small partial charge differences.
+Earlier when we ran `openfe plan-rbfe-network`, one of the steps involved assigning partial charges separately from how
+other force field parameters are applied. AM1-BCC can occasionally give inconsistent results or meaningfully different
+results with different hardware or software versions. Free energy calculations are also particularly sensitive to seemingly
+small partial charge differences. So computing them once for each ligand helps mitigate these reproducibility issues.
+There is a separate command in the CLI which controls this step.
 
 _run openfe charge-molecules cell_
 
@@ -127,28 +139,31 @@ There are a number of other options that can be tinkered with in this command, j
 OpenEye to generate AM1-BCC ELF10 charges or using NAGL to generate GNN charges. These options can be passed in through
 the `settings.yaml` file.
 
+_run openfe charge-molecules cells with NAGL options_
+
 Next, let's talk about network planning, something else a practitioner can tinker with via the settings file. Konnektor
-has has implemented a bunch of different networks, a subset of which has been implemented in OpenFE. The default
+has has implemented a bunch of different networks, and a subset of them have been integrated into OpenFE. The default
 network, which we used earlier, is a minimal spanning tree, which minimizes the number of edges that can connect all
 nodes in a network.
 
 _show network visualization_
 
 If we wanted to switch to, say, a radial or star map, which connects a single node to each other node like a wheel with
-spokes, we can do that by defining it in the settings YAML and re-running the network planning command.
+spokes, we can do that by defining it in the settings YAML and re-running the network planning command. This network
+takes another argument for the central ligand, let's just use ligand 6.
 
-_show radial.yaml, run plan-rbfe-network_ If we wanted to switch to, say, a radial or star map, which connects a single
-node to each other node like a wheel with spokes, we can do that by defining it in the settings YAML and re-running the
-network planning command. This network takes another argument for the central ligand, let's just use ligand 6.
+_show radial.yaml, run plan-rbfe-network, show new visualization_
 
-_show radial.yaml, run plan-rbfe-network_
+There are plenty more options exposed in the CLI and documented in the CLI reference, and further more functionality
+available in the Python API.
 
 14:00
 
-So far in this demo, OpenFF force fields have been used by OpenFE under the hood, by default, for its small molecule
-parameters.  There's much more functionality that can be accessed by interacting directly with OpenFF software, but
-it's also very easy to get on the ground running for simple system. For starters, we'll show that with OpenFF it takes
-literal seconds to go from loading a molecule into RDKit to visualizing a simulation trajectory.
+Finally, I want to show off some things that we can do with OpenFF infrastructure. So far in this demo, OpenFF force
+fields have been used by OpenFE under the hood, by default, for its small molecule parameters.  There's much more
+functionality that can be accessed by interacting directly with OpenFF software, but it's also very easy to get on the
+ground running for simple system. For starters, we'll show that with OpenFF it takes literal seconds to go from loading
+a molecule into RDKit to visualizing a simulation trajectory.
 
 Here we have an aspirin molecule in SDF, which we can load into RDKit and have a quick look at. We need to load a force
 field; here I'll use a recent version in the Sage line, version 2.2.1. From here, it's a one-liner to prepare an OpenMM

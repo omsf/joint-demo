@@ -21,12 +21,14 @@ arguments, like this ...
 
 _show pseudo one-liner_
 
-... but until OpenFold 3 is released, I'm going to be using a pre-production model that was prepared ahead of time.
+... but until OpenFold 3 is released, I'm going to be using a result from a
+pre-production model that was prepared ahead of time.
 
 _show co-folding section_
 
 Here we have the PDB record 5FDR in blue compared against an co-folding prediction in red. We can see excellent
-agreement with the crystallographic result.
+agreement with the crystallographic result,
+though to be aware that this particular structure was part of the PDB training set for this model
 
 For now, because of the results we have available, let's just use a well-established crystal structure of this target.
 
@@ -40,9 +42,10 @@ Visual inspection will show you this this is a congeneric series based around a 
 substitution of the heterocycle and elaborations at both ends.
 
 Our overarching goal is to asses how strongly each ligand binds to MCL1, but we also care if they'd have toxic off-target
-effects. Off-target effects fall under the bucket of adsorption, distribution, metabolism, excretion, and toxicity (ADMET). Here, we'll use OpenADMET's CLI to evaluate this ligand set against a series of CYP anti-targets, which are a class of proteins in the liver that may break down a drug molecule. A pass
+effects. Off-target effects fall under the bucket of adsorption, distribution, metabolism, excretion, and toxicity (ADMET). Here, we'll use OpenADMET's CLI to evaluate this ligand set against a series of CYP anti-targets, which are a class of proteins that may break down a drug molecule. A pass
 through our dataset at this stage isn't free, but it's relatively quick and cheap, almost certainly more efficient than
 trying to "fix" a series at a later stage, after lead optimization.
+OpenADMET also has a Python API and ships some models on huggingface.
 
 _go into notebook, run openadmet predict cell_
 
@@ -117,7 +120,7 @@ average pIC50 of ~6.
 
 But how good are these models, really? Are all of these ligands really binding to CYPs in the range of 1-10 micromolar?
 
-The OpenADMET team thinks these models generally over-predict binding strength due to the pChEMBL data itself having a
+The OpenADMET team thinks these models generally over-predict binding strength due to the ChEMBL data itself having a
 positive skew.  That is to say, the dataset probably skews towards CYP inhibitors (high p) and away from non-binders
 (low p) and doesn't reflect very well the breadth of chemistry that you might design ligands with.
 
@@ -235,10 +238,7 @@ We're ultimately going to load this system as a PDB file through OpenFF Pablo, a
 PDB interoperability throughout OpenFF infrastructure. A core feature of Pablo is support for custom residue
 definitions. These can be defined in a few ways and in this case, it's easiest to make one from an OpenFF molecule. We
 want the residue to represent the cysteine modified with the dye, so we need to get that into a single-molecule
-representation. We have a function `react` which wraps RDKit to do this, the details of which are available in the
-source Python file. It does just what you'd expect - take two reactant molecules and return the result. We also have to
-modify atom names for reasons that are elaborated in the full workflow.  We can run this "reaction" and look at the
-resulting molecule.
+representation. After reaction, we have a single-molecule representation of this modified residue with some atom names changed to match the PDB file.
 
 That's just about all the set up we need to do. The last step is creating our residue definition from this molecule and
 a canned definition of a peptide bond. We can pass this to Pablo's `topology_from_pdb` function and have a look at the

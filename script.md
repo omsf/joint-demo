@@ -28,7 +28,7 @@ _show co-folding section_
 Here we have the PDB record 5FDR in blue compared against an co-folding prediction in red. We can see excellent
 agreement with the crystallographic result.
 
-For now, however, let's just use a well-established crystal structure of this target.
+For now, because of the results we have available, let's just use a well-established crystal structure of this target.
 
 _show protein_
 
@@ -39,8 +39,8 @@ _show ligand SMILES dataframe and 2-D structures_
 Visual inspection will show you this this is a congeneric series based around a bi-heterocyclic core, with
 substitution of the heterocycle and elaborations at both ends.
 
-Our overarching goal is to asses how strongly each ligand binds to MCL1, but we also care if they'd have off-target
-effects. Here, we'll use OpenADMET's CLI to evaluate this ligand set against a series of CYP anti-targets. A pass
+Our overarching goal is to asses how strongly each ligand binds to MCL1, but we also care if they'd have toxic off-target
+effects. Off-target effects fall under the bucket of adsorption, distribution, metabolism, excretion, and toxicity (ADMET). Here, we'll use OpenADMET's CLI to evaluate this ligand set against a series of CYP anti-targets, which are a class of proteins in the liver that may break down a drug molecule. A pass
 through our dataset at this stage isn't free, but it's relatively quick and cheap, almost certainly more efficient than
 trying to "fix" a series at a later stage, after lead optimization.
 
@@ -74,7 +74,8 @@ these later.
 
 _run plan-rbfe-network call_
 
-This sets up a series of alchemical transformations between ligands. Based on our settings file, the Kartograph atom
+This sets up a series of alchemical transformations between ligands which will be used to compute relative binding free energies with a minimum of computational cost.
+Based on our settings file, the Kartograph atom
 mapper is used and a minimal spanning network is generated. Sage is used for small molecule parameters, so AM1-BCC
 partial charges are used. We can see some valuable information is logged.
 
@@ -123,7 +124,8 @@ positive skew.  That is to say, the dataset probably skews towards CYP inhibitor
 _show cell visualizing pChEMBL data_
 
 We see that this underlying data from ChEMBL has a heavy skew towards strong CYP inhibitors and not much data on weaker
-binders. This probably limits the applicability to arbitrary chemistries in an HTS context, and highlights the need for
+binders. This KDE plots are distributions over approximately 8000 molecules.
+This probably limits the applicability to arbitrary chemistries in an HTS context, and highlights the need for
 vastly more data collection of broader chemistries, ideally guided by missing coverage in the datasets.
 
 10:30

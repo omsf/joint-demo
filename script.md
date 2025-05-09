@@ -173,9 +173,9 @@ functionality that can be accessed by interacting directly with OpenFF software,
 ground running for simple system. For starters, we'll show that with OpenFF it takes literal seconds to go from loading
 a molecule into RDKit to visualizing a simulation trajectory.
 
-Here we have an aspirin molecule in SDF, which we can load into RDKit and have a quick look at.
+Let's take the ligand which gave us the strongest dG molecule in SDF, ligand 3, which we can load into RDKit and have a quick look at.
 
-_show aspirin cell_
+_show ligand_3 cell_
 
 We need to load a force field; here I'll use a recent version in the Sage line, version 2.2.1. From here, it's a
 one-liner to prepare an OpenMM system and a little bit of boilerplate to get the simulation running. I've wrapped that

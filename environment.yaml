@@ -33,6 +33,8 @@ dependencies:
 - pytorch_cluster
 - pytorch_scatter
 - pytorch_sparse
+- papermill
+- ipykernel
 - h5py
 - e3nn
 - ase

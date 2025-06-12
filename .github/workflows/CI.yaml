@@ -13,10 +13,8 @@ defaults:
 
 
 jobs:
-  run_hindsight:
+  run_ci:
     runs-on: ubuntu-latest
-    env:
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -45,3 +43,6 @@ jobs:
       - name: Run papermill
         run: |
           papermill joint_demo.ipynb hindsight_executed.ipynb  -k joint_demo  --execution-timeout -1
+
+      - name: Echo done 
+        run: echo "Done running papermill on joint_demo.ipynb"

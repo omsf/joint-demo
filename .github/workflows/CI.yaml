@@ -1,0 +1,63 @@
+name: "CI"
+on:
+  pull_request:
+    branches:
+      - main
+   # Skip CI if changed files only affect the following folders
+   # - docs: documentation changes don't need code validation
+   # See here for more details: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-excluding-paths
+    paths-ignore:
+      - "docs/*"
+  push:
+    branches:
+      - main
+  schedule:
+    # At 07:00 UTC on Monday and Thursday.
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+  release:
+    types:
+      - published
+
+
+defaults:
+  run:
+    shell: bash -l {0}
+
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.12]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +%Y-%m-%d)" >> "${GITHUB_OUTPUT}"
+      
+      - name: Setup Conda Environment
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: environment.yaml
+          environment-name: joint_demo
+          cache-environment: true
+          cache-downloads: true
+          cache-environment-key: environment-${{ steps.date.outputs.date }}
+          cache-downloads-key: downloads-${{ steps.date.outputs.date }}
+          init-shell: bash
+
+
+      - name: Setup kernel
+        run: |
+          python -m ipykernel install --user --name joint_demo
+
+      - name: Run papermill
+        run: |
+          papermill joint-demo.ipynb hindsight_executed.ipynb  -k joint_demo  --execution-timeout -1
+
+      - name: Echo done 
+        run: echo "Done running papermill on joint_demo.ipynb"

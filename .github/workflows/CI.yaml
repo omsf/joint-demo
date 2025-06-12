@@ -1,16 +1,23 @@
-name: Run CI
-
+name: "CI"
 on:
-  schedule:
-    - cron: '0 9 * * 0' # Run every Sunday at 9am UTC
+  pull_request:
+    branches:
+      - main
+   # Skip CI if changed files only affect the following folders
+   # - docs: documentation changes don't need code validation
+   # See here for more details: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-excluding-paths
+    paths-ignore:
+      - "docs/*"
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main 
-  # Allows you to run this workflow manually from the Actions tab
+  schedule:
+    # At 07:00 UTC on Monday and Thursday.
+    - cron: "0 7 * * *"
   workflow_dispatch:
+  release:
+    types:
+      - published
 
 
 defaults:
@@ -19,8 +26,11 @@ defaults:
 
 
 jobs:
-  run_ci:
+  run_tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.12]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -30,7 +40,7 @@ jobs:
         run: echo "date=$(date +%Y-%m-%d)" >> "${GITHUB_OUTPUT}"
       
       - name: Setup Conda Environment
-        uses: mamba-org/setup-micromamba
+        uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: environment.yaml
           environment-name: joint_demo
@@ -38,8 +48,7 @@ jobs:
           cache-downloads: true
           cache-environment-key: environment-${{ steps.date.outputs.date }}
           cache-downloads-key: downloads-${{ steps.date.outputs.date }}
-          create-args: >-
-            python==3.12
+          init-shell: bash
 
 
       - name: Setup kernel

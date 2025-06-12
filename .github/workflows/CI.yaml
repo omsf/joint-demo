@@ -57,7 +57,7 @@ jobs:
 
       - name: Run papermill
         run: |
-          papermill joint_demo.ipynb hindsight_executed.ipynb  -k joint_demo  --execution-timeout -1
+          papermill joint-demo.ipynb hindsight_executed.ipynb  -k joint_demo  --execution-timeout -1
 
       - name: Echo done 
         run: echo "Done running papermill on joint_demo.ipynb"

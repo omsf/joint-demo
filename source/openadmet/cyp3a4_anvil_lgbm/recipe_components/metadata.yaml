@@ -1,0 +1,16 @@
+authors: Hugo M-O
+biotargets:
+- CYP3A4
+build_number: 0
+description: basic regression with combined fingerprint and descriptor features using
+  LGBM
+driver: sklearn
+email: hugo.macdermott-opeskin@omsf.io
+name: CYP3A4_pchembl_lgbm
+tag: openadmet-CYP3A4-pchembl-lgbm
+tags:
+- CYP3A4
+- openadmet
+- test
+- pchembl
+version: v1

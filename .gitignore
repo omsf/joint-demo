@@ -5,3 +5,6 @@
 
 # intermediate files
 trajectory.dcd
+
+# macOS
+.DS_Store

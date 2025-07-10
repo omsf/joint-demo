@@ -1,0 +1,33 @@
+{
+  "tag": "openadmet-CYP3A4-pchembl-lgbm",
+  "mse": {
+    "value": 0.24605534224692246,
+    "lower_ci": 0.22107667365772332,
+    "upper_ci": 0.268177743692891,
+    "confidence_level": 0.95
+  },
+  "mae": {
+    "value": 0.3506397121110509,
+    "lower_ci": 0.34038256670481876,
+    "upper_ci": 0.360728345672279,
+    "confidence_level": 0.95
+  },
+  "r2": {
+    "value": 0.4420671990535734,
+    "lower_ci": 0.4068976863071393,
+    "upper_ci": 0.47963946126396384,
+    "confidence_level": 0.95
+  },
+  "ktau": {
+    "value": 0.43080957163344347,
+    "lower_ci": 0.4137026006186173,
+    "upper_ci": 0.447853522724122,
+    "confidence_level": 0.95
+  },
+  "spearmanr": {
+    "value": 0.5893242923589199,
+    "lower_ci": 0.5680275108039828,
+    "upper_ci": 0.6113244009630185,
+    "confidence_level": 0.95
+  }
+}

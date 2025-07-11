@@ -1,0 +1,80 @@
+data:
+  anvil_dir: file:///store/projects/OpenADMET/openadmet-toolkit/skunkworks/predictions_demo/training
+  cat_entry: null
+  input_col: OPENADMET_SMILES
+  resource: cyp2c9_chembl_permissive.csv
+  target_cols: [pchembl_value_mean]
+  type: intake
+metadata:
+  authors: Hugo M-O
+  biotargets:
+  - CYP2C9
+  build_number: 0
+  description: basic regression with combined fingerprint and descriptor features
+    using LGBM
+  driver: sklearn
+  email: hugo.macdermott-opeskin@omsf.io
+  name: CYP2C9_pchembl_lgbm
+  tag: openadmet-CYP2C9-pchembl-lgbm
+  tags:
+  - CYP2C9
+  - openadmet
+  - test
+  - pchembl
+  version: v1
+procedure:
+  feat:
+    params:
+      featurizers:
+        DescriptorFeaturizer:
+          descr_type: mordred
+        FingerprintFeaturizer:
+          fp_type: ecfp:4
+    type: FeatureConcatenator
+  model:
+    params:
+      model_params:
+        alpha: 0.005
+        learning_rate: 0.05
+    type: LGBMRegressorModel
+  split:
+    params:
+      random_state: 42
+      test_size: 0.3
+      train_size: 0.7
+    type: ShuffleSplitter
+  train:
+    params:
+      param_grid:
+        alpha:
+        - 0.005
+        learning_rate:
+        - 0.05
+        n_estimators:
+        - 500
+    type: SKLearnGridSearchTrainer
+report:
+  eval:
+  - params: {}
+    type: RegressionMetrics
+  - params:
+      axes_labels:
+      - True pChEMBL
+      - Predicted pChEMBL
+      max_val: 10
+      min_val: 3
+      pXC50: true
+      title: CYP2C9 True vs Predicted pChEMBL on test set
+    type: RegressionPlots
+  - params:
+      axes_labels:
+      - True pChEMBL
+      - Predicted pChEMBL
+      max_val: 10
+      min_val: 3
+      n_repeats: 5
+      n_splits: 5
+      pXC50: true
+      random_state: 42
+      title: CYP2C9 True vs Predicted pChEMBL on test set
+    type: SKLearnRepeatedKFoldCrossValidation

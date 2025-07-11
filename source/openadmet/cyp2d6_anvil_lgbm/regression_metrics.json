@@ -1,0 +1,33 @@
+{
+  "tag": "openadmet-CYP2D6-pchembl-lgbm",
+  "mse": {
+    "value": 0.38701427862491333,
+    "lower_ci": 0.35026944154820583,
+    "upper_ci": 0.42237862225380945,
+    "confidence_level": 0.95
+  },
+  "mae": {
+    "value": 0.4516631083616829,
+    "lower_ci": 0.434318875437529,
+    "upper_ci": 0.46849414760395974,
+    "confidence_level": 0.95
+  },
+  "r2": {
+    "value": 0.33881091989006373,
+    "lower_ci": 0.30199056072986186,
+    "upper_ci": 0.3781022744858678,
+    "confidence_level": 0.95
+  },
+  "ktau": {
+    "value": 0.39495883345596616,
+    "lower_ci": 0.371792950701977,
+    "upper_ci": 0.4182671361972219,
+    "confidence_level": 0.95
+  },
+  "spearmanr": {
+    "value": 0.5517944149978331,
+    "lower_ci": 0.5226442093196212,
+    "upper_ci": 0.5818896400437098,
+    "confidence_level": 0.95
+  }
+}

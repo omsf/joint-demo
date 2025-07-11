@@ -1,0 +1,16 @@
+authors: Hugo M-O
+biotargets:
+- CYP2D6
+build_number: 0
+description: basic regression with combined fingerprint and descriptor features using
+  LGBM
+driver: sklearn
+email: hugo.macdermott-opeskin@omsf.io
+name: CYP2D6_pchembl_lgbm
+tag: openadmet-CYP2D6-pchembl-lgbm
+tags:
+- CYP2D6
+- openadmet
+- test
+- pchembl
+version: v1

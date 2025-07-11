@@ -1,0 +1,6 @@
+anvil_dir: file:///store/projects/OpenADMET/openadmet-toolkit/skunkworks/predictions_demo/training
+cat_entry: null
+input_col: OPENADMET_SMILES
+resource: cyp1a2_chembl_permissive.csv
+target_cols: pchembl_value_mean
+type: intake
